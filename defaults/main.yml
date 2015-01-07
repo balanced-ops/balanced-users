@@ -1,2 +1,8 @@
 ---
 # defaults file for balanced-users
+
+# we need to remove the default sudoer from ec2
+# - http://serverfault.com/questions/521124/aws-removing-ec2-user-from-sudo-list
+
+# whether this role is enabled
+balanced_users_enabled: True
