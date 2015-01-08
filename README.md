@@ -57,8 +57,10 @@ balanced_users_${username}:
    authorized_ssh_keys:
      - "ssh-rsa ..... lol@lama"
      - "ssh-rsa ..... lol@lama.gandalf"
+
    # If set, will pull ssh keys from github
    authorized_ssh_keys_from_github_username: mahmoudimus
+
    # Remove specific ssh key (if user state==absent, removes all keys)
    revoked_ssh_keys:
      - "ssh-rsa ..... lol@lama.revokeme"
