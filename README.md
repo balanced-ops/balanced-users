@@ -1,6 +1,7 @@
 # balanced-users
+[![Build Status](http://img.shields.io/travis/balanced-ops/balanced-users.svg?style=flat-square)](https://travis-ci.org/balanced-ops/balanced-users)
 
-An ansible role that manages the user files of the balanced team on remote servers or local machines for a consistent shell feel and personalizations.
+An ansible role that manages the user files of the balanced team on remote servers or local machines for a consistent shell feel and personalization.
 
 **NOTE**: This role is purposefully not prefixed with the common `ansible-*` namespace because it's specialized for [@balanced-ops](https://github.com/balanced-ops) use. It is just here for reference if someone finds it useful.
 

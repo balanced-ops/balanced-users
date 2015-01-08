@@ -18,3 +18,6 @@
 
 - include: groups_delete.yml
   when: balanced_users_enabled
+
+- include: rm_cloudinit_sudoer.yml
+  when: balanced_users_enabled and balanced_users_remove_cloudinit_sudoer
