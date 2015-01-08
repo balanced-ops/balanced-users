@@ -1,0 +1,17 @@
+---
+# group:
+# system_group:
+
+- name: Balanced-Users | Remove user groups if requested
+  group:
+    name: '{{ item.group | default(item.name) }}'
+    state: 'absent'
+  with_flattened:
+    - balanced_users_default
+    - balanced_users_global_admins
+    - balanced_users_default_groups_list
+    - balanced_users_global_users
+    - balanced_users_group_vars_specific_users
+    - balanced_users_host_vars_specific_users
+  when: item.name and (item.state is defined and item.state == 'absent')
+

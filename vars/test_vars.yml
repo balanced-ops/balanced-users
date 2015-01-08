@@ -10,17 +10,15 @@ test_key_names:
 
 balanced_users_mahmoud:
  - name: mahmoud
-   state: "{{ test_user_state |default('present') }}"
+   state: "{{ state | default('present') }}"
    dotfiles: yes
    dotfiles_git_repo: 'https://gist.github.com/8dd8b8d384b2fa484eeb.git'
    dotfiles_install_command: 'bash install.bash'
-   authorized_ssh_keys:
-     - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDNNTyfO4UCeW9nA3dWCJ3Y/sIV3W/fvHRok1lTXYYMhH58YSkOmwXE/Elqm0YXRYToXa45y37sqCn0mxWSGCMkOeF60EdyXn9hC2VHG5ZKQO/7nzI02y9kzhC458N/aQ54AJgegywoH/qlkpNCho13A7bF2SmOhqvdzO67QE3jnNaLhHOniZ+X3mH0nFWiDGBwuDunkP51WQUjZASdB36bqFvDruVv+5RbaGl/y6hl5h/yG/Jh6LGD6uqldn7J6Qu6PioEbNXMpo2WtULJqptlf1XfOCNOzLmhNfrbwrHCilz0wClTIzJivAdSk+RSC3ycGEJILcSmp2GhDiSJJMF5 newserver2
-     - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDEQK0Lp1zQIsGC8JH81LITD3wSwzoq68GKPgqckGLgW+8vUZsJ584gIOAi4MXeDgxct28FKnKTVJv7uHkbbiMDdzIT1sd+RvcGLjhZsNQIIFcVfOHKQ6PVySArHijMTYphlol05/o7QKsBy3L/ms4fS6a/ys1NAQ8sS4a19diFDGHRw6xGUbWEKmkRvUJFn0UV4d7ULBl/2sSP9msMW1TNIDyEFdVBRgTIp87g12JJOSG0/kRQqZ7D5ts9RoTvdmKtcDtg5rMOFdv7V1KdVZNAl+UAECkF4mgXSDNIFy6jPFEAqo63t6BT+wPjTP5ecv05gL+6jyz8SJm/OMXyGjiX newserver
+   authorized_ssh_keys: "{{ authorized_ssh_keys | default }}"
    # If set, will pull ssh keys from github
    authorized_ssh_keys_from_github_username: mahmoudimus
    # Remove specific ssh key (if user state==absent, removes all keys)
-   revoked_ssh_keys:
+   revoked_ssh_keys: "{{ revoked_ssh_keys | default }}"
 
 balanced_users_global_admins:
  - balanced_users_mahmoud

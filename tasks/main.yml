@@ -1,7 +1,10 @@
 ---
 # tasks file for balanced-users
 
-- include: groups.yml
+# - groups are created first and removed last, because when we say that a user
+#   is absent, the group needs to be removed *after* the user is removed,
+#   not *before*, though, this could probably be done via handler
+- include: groups_create.yml
   when: balanced_users_enabled
 
 - include: users.yml
@@ -11,4 +14,7 @@
   when: balanced_users_enabled
 
 - include: dotfiles.yml
+  when: balanced_users_enabled
+
+- include: groups_delete.yml
   when: balanced_users_enabled

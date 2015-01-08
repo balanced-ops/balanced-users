@@ -4,21 +4,88 @@
   sudo: true
   vars_files:
     - vars/test_vars.yml
-  pre_tasks:
-#    - name: create a few ssh keys
-#      command: ssh-keygen -t rsa -C {{ item }} -f /tmp/{{ item }}
-#      with_items: test_key_names
+
+  tasks:
+    - name: create a few ssh keys
+      shell: |
+        rm -f /tmp/{{ item }} &&
+           ssh-keygen -t rsa -C {{ item }} -f /tmp/{{ item }} -N ''
+      with_items: test_key_names
+
     - name: slurp remote ssh keygened files
-      slurp: src=/tmp/{{ item }}
-      with_items:  #test_key_names
-         - test
-         - test_2
-      register: slurpz
-    - name: set authorized keys
-      # set_fact: "{{ item.item }}={{ item.content | b64decode }}"
-      shell: echo "{{ item.item + '\n' + item.content | b64decode }}"
-      with_items: slurpz.results
-#    - name: ll
-#      debug: var="{{ slurpz }}"
-#  roles:
-#    - role: '../balanced-users'
+      slurp: src=/tmp/{{ item }}.pub
+      with_items:
+        - "{{ test_key_names }}"
+      register: keys
+
+    - name: set the authorized keys
+      set_fact:
+        authorized_key_1: "{{ keys.results[0].content | b64decode | trim }}"
+        authorized_key_2: "{{ keys.results[1].content | b64decode | trim }}"
+
+
+- hosts: all
+  sudo: true
+  vars_files:
+    - vars/test_vars.yml
+  roles:
+    - {role: '../balanced-users',
+       authorized_ssh_keys: [
+         "{{ authorized_key_1 }}",
+         "{{ authorized_key_2 }}"
+       ]}
+  tasks:
+    - set_fact:
+        authorized_key_file: "{{balanced_users_default_home_prefix}}/{{ balanced_users_mahmoud[0].name }}/.ssh/authorized_keys"
+    - name: check that the keys are located in ~mahmoud/.ssh/authorized_keys
+      shell: grep -q "{{ item }}" "{{ authorized_key_file }}"
+      register: added_to_keys
+      with_items:
+        - "{{ authorized_key_1 }}"
+        - "{{ authorized_key_2 }}"
+    - assert:
+        that:
+          - "{{ item.rc }} == 0"
+      with_items:
+        - "{{ added_to_keys.results }}"
+
+- hosts: all
+  sudo: true
+  vars_files:
+    - vars/test_vars.yml
+  roles:
+    - role: '../balanced-users'
+      authorized_ssh_keys: ["{{ authorized_key_1 }}"]
+      revoked_ssh_keys: ["{{ authorized_key_2 }}"]
+  tasks:
+    - set_fact:
+        authorized_key_file: "{{balanced_users_default_home_prefix}}/{{ balanced_users_mahmoud[0].name }}/.ssh/authorized_keys"
+    - name: check that the keys are located in "{{ authorized_key_file }}"
+      shell: grep -q "{{ authorized_key_1 }}" "{{ authorized_key_file }}"
+      register: added_to_keys
+    - assert:
+        that:
+          - "{{ added_to_keys.rc }} == 0"
+    - name: check that the keys was removed from "{{ authorized_key_file }}"
+      shell: '! grep -q "{{ authorized_key_2 }}" "{{ authorized_key_file }}"'
+      register: removed_from_keys
+    - assert:
+        that:
+          - "{{ removed_from_keys.rc }} == 0"
+
+- hosts: all
+  sudo: true
+  vars_files:
+    - vars/test_vars.yml
+  roles:
+    - role: '../balanced-users'
+      state: 'absent'
+      authorized_ssh_keys: ["{{ authorized_key_1 }}"]
+      revoked_ssh_keys: ["{{ authorized_key_2 }}"]
+  tasks:
+    - name: does the user exist?
+      shell: '! grep -q "{{ balanced_users_mahmoud[0].name }}" /etc/passwd'
+      register: user_dne
+    - assert:
+        that:
+          - "{{ user_dne.rc }} == 0"
