@@ -52,7 +52,6 @@ balanced_users_${username}:
    dotfiles: False/True           # download and configure dotfiles?
    dotfiles_git_repo: 'repository'
    dotfiles_install_command: 'make all'
-   dotfiles_creates '~/.zshrc'    # idempotent create
 
    # Add ssh authorized keys
    authorized_ssh_keys:
