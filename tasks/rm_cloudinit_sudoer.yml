@@ -1,15 +1,17 @@
 ---
 #- we need to remove the default sudoer from ec2
 #- - http://serverfault.com/questions/521124/aws-removing-ec2-user-from-sudo-list
+- name: Balanced-Users | Checking to see if on EC2
+  ec2_facts:
 
 - name: Balanced-Users | Remove default cloudinit sudoer user on Debian (for security)
-  when: ansible_os_family == "Debian"
+  when: ansible_os_family == "Debian" and ansible_ec2_instance_id is defined
   file:
     state: 'absent'
     dest: /etc/sudoers.d/90-cloudimg-ubuntu
 
 - name: Balanced-Users | Remove default cloudinit sudoer user on RedHat (for security)
-  when: ansible_os_family == "RedHat"
+  when: ansible_os_family == "RedHat" and ansible_ec2_instance_id is defined
   file:
     state: 'absent'
     dest: /etc/sudoers.d/cloud-init

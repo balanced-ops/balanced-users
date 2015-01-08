@@ -14,7 +14,9 @@ An ansible role that manages the user files of the balanced team on remote serve
 
 ## Features
 
-- Can use github ssh keys
+- Can use github ssh keys via the `authorized_ssh_keys_from_github_username` attribute
+- Can remove users and groups
+- Allows for customizations per user, see `vars/test_vars.yml` for an example
 
 ### EC2 Specific
 - Removes the default sudoer from ec2 (whether its ec2-user or ubuntu)
