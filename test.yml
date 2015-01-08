@@ -1,0 +1,24 @@
+---
+
+- hosts: all
+  sudo: true
+  vars_files:
+    - vars/test_vars.yml
+  pre_tasks:
+#    - name: create a few ssh keys
+#      command: ssh-keygen -t rsa -C {{ item }} -f /tmp/{{ item }}
+#      with_items: test_key_names
+    - name: slurp remote ssh keygened files
+      slurp: src=/tmp/{{ item }}
+      with_items:  #test_key_names
+         - test
+         - test_2
+      register: slurpz
+    - name: set authorized keys
+      # set_fact: "{{ item.item }}={{ item.content | b64decode }}"
+      shell: echo "{{ item.item + '\n' + item.content | b64decode }}"
+      with_items: slurpz.results
+#    - name: ll
+#      debug: var="{{ slurpz }}"
+#  roles:
+#    - role: '../balanced-users'

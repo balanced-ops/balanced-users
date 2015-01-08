@@ -1,0 +1,85 @@
+---
+## root user (ignore all customizations for now)
+- name: Balanced-Users | Enforce root group
+  group:
+    name: root
+    gid: 0
+    system: yes
+    state: present
+
+- name: Balanced-Users | Enforce root user account
+  user:
+    name: root
+    state: present
+    group: root
+    home: /root
+    uid: 0
+    append: no
+    system: yes
+    shell: "{{ item.shell | default(balanced_users_default_shell) }}"
+  with_flattened:
+    - balanced_users_root
+  when: item.name is defined and item.name
+
+- name: Balanced-Users | Enforce root home permissions
+  file: state=directory path=/root owner=root group=root mode=0700
+
+# name:
+# group:
+# state:
+# comment:
+# password:
+# update_password:
+# system_user:
+# shell:
+# home:
+# groups:
+# append:
+- name: Balanced-Users | Create users
+  user:
+    name: '{{ item.name }}'
+    group: '{{ item.group | default(item.name) }}'
+    state: '{{ item.state | default("present") }}'
+    comment: '{{ item.comment | default("") }}'
+    password: '{{ item.password | default("*") }}'
+    update_password: '{{ item.update_password | default("on_create") }}'
+    system: '{{ item.system_user | default("no") }}'
+    shell: '{{ item.shell | default(balanced_users_default_shell) }}'
+    home: '{{ item.home | default(balanced_users_default_home_prefix + "/" + item.name) }}'
+    createhome: 'yes'
+  with_flattened:
+    - balanced_users_default
+    - balanced_users_global_admins
+    - balanced_users_global_users
+    - balanced_users_group_vars_specific_users
+    - balanced_users_host_vars_specific_users
+  when: item.name
+
+- name: Balanced-Users | Manage user's to default global group associations
+  user:
+    name: '{{ item.name }}'
+    state: '{{ item.state | default("present") }}'
+    groups: '{{ balanced_users_group_vars_specific_users | join(",") }}'
+    append: '{{ balanced_users_default_groups_append) }}'
+  with_flattened:
+    - balanced_users_default
+    - balanced_users_global_admins
+    - balanced_users_global_users
+    - balanced_users_group_vars_specific_users
+    - balanced_users_host_vars_specific_users
+  when: item.name and balanced_users_group_vars_specific_users
+
+- name: Balanced-Users | Manage user's specific group association
+  user:
+    name: '{{ item.name }}'
+    state: '{{ item.state | default("present") }}'
+    groups: '{{ item.groups | join(",") }}'
+    append: '{{ item.append | default("yes") }}'
+  with_flattened:
+    - balanced_users_default
+    - balanced_users_global_admins
+    - balanced_users_global_users
+    - balanced_users_group_vars_specific_users
+    - balanced_users_host_vars_specific_users
+  when: item.name and (item.groups is defined and items.groups)
+

@@ -1,2 +1,14 @@
 ---
 # tasks file for balanced-users
+
+- include: groups.yml
+  when: balanced_users_enabled
+
+- include: users.yml
+  when: balanced_users_enabled
+
+- include: ssh_keys.yml
+  when: balanced_users_enabled
+
+- include: dotfiles.yml
+  when: balanced_users_enabled

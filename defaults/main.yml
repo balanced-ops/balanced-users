@@ -1,8 +1,48 @@
 ---
 # defaults file for balanced-users
+#- we need to remove the default sudoer from ec2
+#- - http://serverfault.com/questions/521124/aws-removing-ec2-user-from-sudo-list
 
-# we need to remove the default sudoer from ec2
-# - http://serverfault.com/questions/521124/aws-removing-ec2-user-from-sudo-list
+# Enable this role?
+balanced_users_enabled: true
 
-# whether this role is enabled
-balanced_users_enabled: True
+# Global defaults
+
+## default user, created by Ansible
+balanced_users_default:
+  - name: '{{ ansible_ssh_user }}'
+
+## the root user, if you want to change something on the root account
+## don't modify unless you know what you're doing
+balanced_users_root:
+  - name: 'root'
+
+## default shell used for new accounts
+balanced_users_default_shell: '/bin/bash'
+
+## list of default groups added to new accounts
+balanced_users_default_groups_list: []
+
+## when yes, default groups be added to existing groups
+## when no, default groups will replace existing groups
+balanced_users_default_groups_append: 'yes'
+
+## where should directories be created (osx: /Users)
+balanced_users_default_home_prefix: '/home'
+
+# Configurable lists for different accounts for creation and management
+
+## global administrators
+balanced_users_global_admins: []
+
+## global groups (normal or system)
+balanced_users_global_groups: []
+
+## global users
+balanced_users_global_users: []
+
+## set this via ansible group_vars
+balanced_users_group_vars_specific_users: []
+
+## set this via ansible host_vars
+balanced_users_host_vars_specific_users: []

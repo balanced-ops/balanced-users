@@ -1,0 +1,7 @@
+roles/
+
+# use Vagabond :)
+Vagrantfile
+
+# secrets
+defaults/secret.yml

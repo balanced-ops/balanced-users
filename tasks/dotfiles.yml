@@ -1,0 +1,51 @@
+---
+# dotfiles:
+# dotfiles_repo:
+# dotfiles_dest:
+# dotfiles_install_command:
+# dotfiles_creates:
+
+- name: Balanced-Users | Install git (Debian)
+  apt: pkg=git state=present
+  when: ansible_os_family == "Debian"
+
+- name: Balanced-Users | Install git (RedHat)
+  yum: pkg=git state=present
+  when: ansible_os_family == "RedHat"
+
+- name: Balanced-Users | Get dotfiles from git repository for user
+  sudo_user: '{{ item.name }}'
+  git: repo={{ item.dotfiles_git_repo }}
+       dest={{ item.dotfiles_dest | default('~/.config/dotfiles') }}
+       update=yes
+  register: git_repo_status
+  with_flattened:
+    - balanced_users_root
+    - balanced_users_default
+    - balanced_users_global_admins
+    - balanced_users_global_users
+    - balanced_users_group_vars_specific_users
+    - balanced_users_host_vars_specific_users
+  when: |
+    item.name and
+      (item.dotfiles is defined and item.dotfiles) and
+      (not item.state or item.state and item.state != 'absent')
+
+- name: Balanced-Users | Configure users dotfiles
+  sudo_user: '{{ item.name }}'
+  command: "{{ item.dotfiles_install_command }}"
+  args:
+    chdir: "{{ item.dotfiles_dest | default('~/.config/dotfiles') }}"
+  with_flattened:
+    - balanced_users_root
+    - balanced_users_default
+    - balanced_users_global_admins
+    - balanced_users_global_users
+    - balanced_users_group_vars_specific_users
+    - balanced_users_host_vars_specific_users
+  when: |
+    item.name and
+      (item.dotfiles is defined and item.dotfiles) and
+      (not item.state or item.state and item.state != 'absent') and
+      git_repo_status.changed
+

@@ -1,0 +1,85 @@
+---
+# authorized_ssh_keys:
+# authorized_ssh_keys_from_github_username:
+# revoked_ssh_keys:
+
+- name: Balanced-Users | Configure authorized SSH keys for users
+  authorized_key:
+    key: '{{ item.authorized_ssh_keys | join("\n") | string }}'
+    state: "present"
+    user: "{{ item.name }}"
+  with_flattened:
+    - balanced_users_default
+    - balanced_users_global_admins
+    - balanced_users_global_users
+    - balanced_users_group_vars_specific_users
+    - balanced_users_host_vars_specific_users
+  when: |
+    item.name and
+        (item.state is undefined or item.state != 'absent') and
+        (item.authorized_ssh_keys is defined and item.authorized_ssh_keys)
+
+- name: Balanced-Users | Fetch authorized SSH keys from Github
+  sudo: no
+  get_url:
+    url: https://github.com/{{ item.authorized_ssh_keys_from_github_username }}.keys
+    dest: /tmp/{{ item.authorized_ssh_keys_from_github_username }}.keys
+  delegate_to: 127.0.0.1
+  with_flattened:
+    - balanced_users_default
+    - balanced_users_global_admins
+    - balanced_users_global_users
+    - balanced_users_group_vars_specific_users
+    - balanced_users_host_vars_specific_users
+  when: |
+    item.name and
+        (item.state is undefined or item.state != 'absent') and
+        (item.authorized_ssh_keys_from_github_username is defined and
+             item.authorized_ssh_keys_from_github_username)
+
+- name: Balanced-Users | Append Github SSH keys for users to authorized_keys
+  authorized_key:
+    key: "{{ lookup('file', '/tmp/' + item.authorized_ssh_keys_from_github_username + '.keys') }}"
+    state: "present"
+    user: "{{ item.name }}"
+  with_flattened:
+    - balanced_users_default
+    - balanced_users_global_admins
+    - balanced_users_global_users
+    - balanced_users_group_vars_specific_users
+    - balanced_users_host_vars_specific_users
+  when: |
+    item.name and
+        (item.state is undefined or item.state != 'absent') and
+        (item.authorized_ssh_keys_from_github_username is defined and
+             item.authorized_ssh_keys_from_github_username)
+
+## TODO: might be race condition here?
+- name: Balanced-Users | Remove ~/.ssh/authorized_keys from user account, if disabled
+  file:
+    state: "absent"
+    dest: |
+      "{{ item.home | default(balanced_users_default_home_prefix + '/' + item.name) }}/.ssh/authorized_keys"
+  with_flattened:
+    - balanced_users_default
+    - balanced_users_global_admins
+    - balanced_users_global_users
+    - balanced_users_group_vars_specific_users
+    - balanced_users_host_vars_specific_users
+  when: item.name and (item.state is defined and item.state == 'absent')
+
+- name: Balanced-Users | Revoke ssh keys from ~/.ssh/authorized_keys for user
+  authorized_key:
+    key: '{{ item.revoked_ssh_keys | join("\n") | string }}'
+    state: "absent"
+    user: "{{ item.name }}"
+  with_flattened:
+    - balanced_users_default
+    - balanced_users_global_admins
+    - balanced_users_global_users
+    - balanced_users_group_vars_specific_users
+    - balanced_users_host_vars_specific_users
+  when: |
+    item.name and (item.state is defined and item.state != 'absent') and
+        (item.revoked_ssh_keys is defined and item.revoked_ssh_keys)
+
