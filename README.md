@@ -27,30 +27,34 @@ An ansible role that manages the user files of the balanced team on remote serve
 
 The only **required** field is `name`.
 
-List of all recognized values, default value listed first.
-
-Example:
+Example of configuration below. We list of all configurable values, and they're
+set to their default value.
 
 ```yaml
 
 balanced_users_admins_list:     # sets a global list of admins referencing users
- - balanced_users_mahmoud
- - balanced_users_${username}
+ - user_mahmoud
+ - user_${username}
 
-balanced_users_${username}:
+user_${username}:
  - name: 'username'               # mandatory, default group if not defined
    state: 'present,absent'
+   shell: '/bin/bash'             # defaults to /bin/bash
+
    group: 'name'                  # defaults to the name of the user
+   # groups here must exist on the system, if they don't, you must
+   # create them by setting the `balanced_users_groups_list`
    groups: []                     # list of groups to set
    append: yes/no                 # add to, or set groups
-   shell: '/bin/bash'             # defaults to /bin/bash
 
    # http://unix.stackexchange.com/questions/80277/whats-the-difference-between-a-normal-user-and-a-system-user
    system_user: no/yes            # create system user, defaults to no
+   # http://askubuntu.com/questions/523949/what-is-a-system-group-as-opposed-to-a-normal-group
    system_group: no/yes           # create system group, defaults to no
 
    comment: '${username} is a really cool person'
 
+   # dotfiles support!
    dotfiles: False/True           # download and configure dotfiles?
    dotfiles_git_repo: 'repository'
    dotfiles_install_command: 'make all'
@@ -71,7 +75,21 @@ balanced_users_${username}:
    password: 's0m3-s3cr3t-!!'     # mkpasswd --method=SHA-512 or cat /etc/shadow
    update_password: 'on_create'   # always will update passwords if they differ.
                                   # on_create will only set the password for newly created users. (added in Ansible 1.3)
+
+
+balanced_users_groups_list:     # sets a global list of groups to create
+ - group_admin
+
+group_admin:
+ - name: 'group-name'               # mandatory
+   state: 'present,absent'
+   is_sudoer: 'no/yes'              # will add to /etc/sudoers.d/50-{{name}}
 ```
+
+## TODO
+
+Sudoer work
+ - probably need to define system wide admin role
 
 ## LICENSE
 

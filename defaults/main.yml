@@ -8,6 +8,10 @@ balanced_users_enabled: true
 ## removes the default cloudinit users from sudoers
 balanced_users_remove_cloudinit_sudoer: true
 
+is_redhat_family: "{{ ansible_os_family == 'RedHat' }}"
+is_debian_family: "{{ ansible_os_family == 'Debian' }}"
+
+balanced_users_admin_group: "{{ 'wheel' if not is_debian_family else 'admin'}}"
 
 ##############################
 # Configurable lists for different accounts for creation and management

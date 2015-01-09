@@ -23,31 +23,39 @@
         authorized_key_1: "{{ keys.results[0].content | b64decode | trim }}"
         authorized_key_2: "{{ keys.results[1].content | b64decode | trim }}"
 
-
 - hosts: all
   sudo: true
   vars_files:
     - vars/test_vars.yml
   roles:
-    - {role: '../balanced-users',
-       authorized_ssh_keys: [
-         "{{ authorized_key_1 }}",
-         "{{ authorized_key_2 }}"
-       ]}
+    - role: '../balanced-users'
+      authorized_ssh_keys:
+        - "{{ authorized_key_1 }}"
+        - "{{ authorized_key_2 }}"
   tasks:
     - set_fact:
-        authorized_key_file: "{{balanced_users_default_home_prefix}}/{{ balanced_users_mahmoud[0].name }}/.ssh/authorized_keys"
+        authorized_key_file: "{{balanced_users_default_home_prefix}}/{{ user_mahmoud[0].name }}/.ssh/authorized_keys"
     - name: check that the keys are located in ~mahmoud/.ssh/authorized_keys
       shell: grep -q "{{ item }}" "{{ authorized_key_file }}"
       register: added_to_keys
       with_items:
         - "{{ authorized_key_1 }}"
         - "{{ authorized_key_2 }}"
-    - assert:
+    - name: assert | both ssh keys are associated with the user
+      assert:
         that:
           - "{{ item.rc }} == 0"
       with_items:
         - "{{ added_to_keys.results }}"
+    - name: query mahmoud groups
+      sudo_user: "{{ user_mahmoud[0].name }}"
+      shell: 'groups'
+      register: mahmoud_groups
+    - name: assert | mahmoud is part of "{{ balanced_users_admin_group }}"?
+      assert:
+        that:
+          - "mahmoud_groups.stdout.find('{{ balanced_users_admin_group }}') != -1"
+
 
 - hosts: all
   sudo: true
@@ -59,7 +67,7 @@
       revoked_ssh_keys: ["{{ authorized_key_2 }}"]
   tasks:
     - set_fact:
-        authorized_key_file: "{{balanced_users_default_home_prefix}}/{{ balanced_users_mahmoud[0].name }}/.ssh/authorized_keys"
+        authorized_key_file: "{{balanced_users_default_home_prefix}}/{{ user_mahmoud[0].name }}/.ssh/authorized_keys"
     - name: check that the keys are located in "{{ authorized_key_file }}"
       shell: grep -q "{{ authorized_key_1 }}" "{{ authorized_key_file }}"
       register: added_to_keys
@@ -69,9 +77,25 @@
     - name: check that the keys was removed from "{{ authorized_key_file }}"
       shell: '! grep -q "{{ authorized_key_2 }}" "{{ authorized_key_file }}"'
       register: removed_from_keys
-    - assert:
+    - name: assert | only one key is now associated with the user
+      assert:
         that:
           - "{{ removed_from_keys.rc }} == 0"
+    - name: does dudette user exist?
+      shell: 'grep -q "{{ user_dudette[0].name }}" /etc/passwd'
+      register: user_exists
+    - name: assert | user exists on the system
+      assert:
+        that:
+          - "{{ user_exists.rc }} == 0"
+    - name: does dudette belong to her group?
+      sudo_user: "{{ user_dudette[0].name }}"
+      shell: 'groups'
+      register: dudette_groups
+    - name: assert | user associated to desired groups
+      assert:
+        that:
+          - "dudette_groups.stdout.find('randomgroup') != -1"
 
 - hosts: all
   sudo: true
@@ -84,8 +108,9 @@
       revoked_ssh_keys: ["{{ authorized_key_2 }}"]
   tasks:
     - name: does the user exist?
-      shell: '! grep -q "{{ balanced_users_mahmoud[0].name }}" /etc/passwd'
+      shell: '! grep -q "{{ user_mahmoud[0].name }}" /etc/passwd'
       register: user_dne
-    - assert:
+    - name: assert | user no longer exists on the system
+      assert:
         that:
           - "{{ user_dne.rc }} == 0"

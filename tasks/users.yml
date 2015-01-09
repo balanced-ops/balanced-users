@@ -81,5 +81,14 @@
     - balanced_users_list
     - balanced_users_group_vars_specific_users
     - balanced_users_host_vars_specific_users
-  when: item.name and (item.groups is defined and items.groups)
+  when: item.name and (item.groups is defined and item.groups)
 
+- name: Balanced-Users | Associate admins list with admin group
+  user:
+    name: '{{ item.name }}'
+    state: '{{ item.state | default("present") }}'
+    groups: '{{ balanced_users_admin_group }}'
+    append: '{{ item.append | default("yes") }}'
+  with_flattened:
+    - balanced_users_admins_list
+  when: item.name
