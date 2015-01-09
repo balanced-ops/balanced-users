@@ -8,7 +8,31 @@ balanced_users_enabled: true
 ## removes the default cloudinit users from sudoers
 balanced_users_remove_cloudinit_sudoer: true
 
+
+##############################
+# Configurable lists for different accounts for creation and management
+##############################
+
+
+## global administrators
+balanced_users_admins_list: []
+
+## global groups (normal or system)
+balanced_users_groups_list: []
+
+## global users
+balanced_users_list: []
+
+## set this via ansible group_vars
+balanced_users_group_vars_specific_users: []
+
+## set this via ansible host_vars
+balanced_users_host_vars_specific_users: []
+
+
+##############################
 # Global defaults
+##############################
 
 ## default user, created by Ansible
 balanced_users_default:
@@ -31,20 +55,3 @@ balanced_users_default_groups_append: 'yes'
 
 ## where should directories be created (osx: /Users)
 balanced_users_default_home_prefix: '/home'
-
-# Configurable lists for different accounts for creation and management
-
-## global administrators
-balanced_users_global_admins: []
-
-## global groups (normal or system)
-balanced_users_global_groups: []
-
-## global users
-balanced_users_global_users: []
-
-## set this via ansible group_vars
-balanced_users_group_vars_specific_users: []
-
-## set this via ansible host_vars
-balanced_users_host_vars_specific_users: []

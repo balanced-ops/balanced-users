@@ -20,5 +20,5 @@ balanced_users_mahmoud:
    # Remove specific ssh key (if user state==absent, removes all keys)
    revoked_ssh_keys: "{{ revoked_ssh_keys | default }}"
 
-balanced_users_global_admins:
+balanced_users_admins_list:
  - balanced_users_mahmoud

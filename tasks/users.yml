@@ -49,8 +49,8 @@
     createhome: 'yes'
   with_flattened:
     - balanced_users_default
-    - balanced_users_global_admins
-    - balanced_users_global_users
+    - balanced_users_admins_list
+    - balanced_users_list
     - balanced_users_group_vars_specific_users
     - balanced_users_host_vars_specific_users
   when: item.name
@@ -59,15 +59,15 @@
   user:
     name: '{{ item.name }}'
     state: '{{ item.state | default("present") }}'
-    groups: '{{ balanced_users_group_vars_specific_users | join(",") }}'
+    groups: '{{ balanced_users_default_groups_list | join(",") }}'
     append: '{{ balanced_users_default_groups_append) }}'
   with_flattened:
     - balanced_users_default
-    - balanced_users_global_admins
-    - balanced_users_global_users
+    - balanced_users_admins_list
+    - balanced_users_list
     - balanced_users_group_vars_specific_users
     - balanced_users_host_vars_specific_users
-  when: item.name and balanced_users_group_vars_specific_users
+  when: item.name and balanced_users_default_groups_list
 
 - name: Balanced-Users | Manage user's specific group association
   user:
@@ -77,8 +77,8 @@
     append: '{{ item.append | default("yes") }}'
   with_flattened:
     - balanced_users_default
-    - balanced_users_global_admins
-    - balanced_users_global_users
+    - balanced_users_admins_list
+    - balanced_users_list
     - balanced_users_group_vars_specific_users
     - balanced_users_host_vars_specific_users
   when: item.name and (item.groups is defined and items.groups)

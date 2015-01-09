@@ -10,8 +10,8 @@
     user: "{{ item.name }}"
   with_flattened:
     - balanced_users_default
-    - balanced_users_global_admins
-    - balanced_users_global_users
+    - balanced_users_admins_list
+    - balanced_users_list
     - balanced_users_group_vars_specific_users
     - balanced_users_host_vars_specific_users
   when: |
@@ -27,8 +27,8 @@
   delegate_to: 127.0.0.1
   with_flattened:
     - balanced_users_default
-    - balanced_users_global_admins
-    - balanced_users_global_users
+    - balanced_users_admins_list
+    - balanced_users_list
     - balanced_users_group_vars_specific_users
     - balanced_users_host_vars_specific_users
   when: |
@@ -44,8 +44,8 @@
     user: "{{ item.name }}"
   with_flattened:
     - balanced_users_default
-    - balanced_users_global_admins
-    - balanced_users_global_users
+    - balanced_users_admins_list
+    - balanced_users_list
     - balanced_users_group_vars_specific_users
     - balanced_users_host_vars_specific_users
   when: |
@@ -62,8 +62,8 @@
       "{{ item.home | default(balanced_users_default_home_prefix + '/' + item.name) }}/.ssh/authorized_keys"
   with_flattened:
     - balanced_users_default
-    - balanced_users_global_admins
-    - balanced_users_global_users
+    - balanced_users_admins_list
+    - balanced_users_list
     - balanced_users_group_vars_specific_users
     - balanced_users_host_vars_specific_users
   when: item.name and (item.state is defined and item.state == 'absent')
@@ -75,8 +75,8 @@
     user: "{{ item.name }}"
   with_flattened:
     - balanced_users_default
-    - balanced_users_global_admins
-    - balanced_users_global_users
+    - balanced_users_admins_list
+    - balanced_users_list
     - balanced_users_group_vars_specific_users
     - balanced_users_host_vars_specific_users
   when: |

@@ -33,7 +33,7 @@ Example:
 
 ```yaml
 
-balanced_users_global_admins:     # sets a global list of admins referencing users
+balanced_users_admins_list:     # sets a global list of admins referencing users
  - balanced_users_mahmoud
  - balanced_users_${username}
 
@@ -44,6 +44,8 @@ balanced_users_${username}:
    groups: []                     # list of groups to set
    append: yes/no                 # add to, or set groups
    shell: '/bin/bash'             # defaults to /bin/bash
+
+   # http://unix.stackexchange.com/questions/80277/whats-the-difference-between-a-normal-user-and-a-system-user
    system_user: no/yes            # create system user, defaults to no
    system_group: no/yes           # create system group, defaults to no
 

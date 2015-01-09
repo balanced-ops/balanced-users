@@ -8,9 +8,9 @@
     state: 'present'
   with_flattened:
     - balanced_users_default
-    - balanced_users_global_admins
-    - balanced_users_default_groups_list
-    - balanced_users_global_users
+    - balanced_users_admins_list
+    - balanced_users_groups_list
+    - balanced_users_list
     - balanced_users_group_vars_specific_users
     - balanced_users_host_vars_specific_users
   when: |
