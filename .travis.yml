@@ -7,6 +7,9 @@ python:
 before_install:
  - sudo apt-get update -qq
  - sudo apt-get install -qq python-apt python-pycurl
+ - sudo cat /etc/passwd
+ - sudo cat /etc/sudoers
+ - sudo getent group
 
 install:
   - pip install ansible>=1.8.0
@@ -19,7 +22,7 @@ script:
   - ansible-playbook --syntax-check -i inventory test.yml
 
   # First run
-  - ansible-playbook -i inventory test.yml --connection=local --sudo
+  - ansible-playbook -i inventory test.yml --connection=local --sudo -vv
 
 #  # Second run Idempotence test
 #  - >
