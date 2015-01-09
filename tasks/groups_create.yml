@@ -16,3 +16,25 @@
   when: |
     item.name and (item.state is undefined or
                    (item.state is defined and item.state != "absent"))
+
+# create admin group if not found
+
+- name: Balanced-Users | Get all system groups
+  shell: getent group
+  register: system_groups
+
+- name: Balanced-Users | Ensure admin group exists
+  group:
+    name: '{{ balanced_users_admin_group }}'
+    system: 'yes'
+    state: 'present'
+  when: balanced_users_admin_group not in system_groups.stdout_lines
+
+- name: Balanced-Users | Ensure admin group in /etc/sudoers
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%{{ balanced_users_admin_group }} ALL='
+    line: '%{{ balanced_users_admin_group }} ALL=(ALL) ALL'
+    validate: 'visudo -cf %s'
+  when: balanced_users_admin_group not in system_groups.stdout_lines

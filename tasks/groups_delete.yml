@@ -14,4 +14,3 @@
     - balanced_users_group_vars_specific_users
     - balanced_users_host_vars_specific_users
   when: item.name and (item.state is defined and item.state == 'absent')
-
