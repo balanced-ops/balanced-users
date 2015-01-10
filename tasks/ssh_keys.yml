@@ -24,6 +24,7 @@
   get_url:
     url: https://github.com/{{ item.authorized_ssh_keys_from_github_username }}.keys
     dest: /tmp/{{ item.authorized_ssh_keys_from_github_username }}.keys
+    validate_certs: no
   delegate_to: 127.0.0.1
   with_flattened:
     - balanced_users_default
