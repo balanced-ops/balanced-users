@@ -19,5 +19,5 @@
 - include: groups_delete.yml
   when: balanced_users_enabled
 
-- include: rm_cloudinit_sudoer.yml
-  when: balanced_users_enabled and balanced_users_remove_cloudinit_sudoer
+- include: rm_default_ec2_keyname.yml
+  when: balanced_users_enabled and balanced_users_rm_default_ec2_keyname

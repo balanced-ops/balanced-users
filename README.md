@@ -19,7 +19,7 @@ An ansible role that manages the user files of the balanced team on remote serve
 - Allows for customizations per user, see `vars/test_vars.yml` for an example
 
 ### EC2 Specific
-- Removes the default sudoer from ec2 (whether its ec2-user or ubuntu)
+- Removes the default ec2 login SSH keys (whether its ec2-user or ubuntu)
 
 ## Usage
 

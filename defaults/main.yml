@@ -5,8 +5,8 @@
 
 ## enable this role?
 balanced_users_enabled: true
-## removes the default cloudinit users from sudoers
-balanced_users_remove_cloudinit_sudoer: true
+## removes the default ec2 keyname used to provision the instance
+balanced_users_rm_default_ec2_keyname: true
 
 is_redhat_family: "{{ ansible_os_family == 'RedHat' }}"
 is_debian_family: "{{ ansible_os_family == 'Debian' }}"
