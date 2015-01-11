@@ -35,6 +35,6 @@
     dest: /etc/sudoers
     state: present
     regexp: '^%{{ balanced_users_admin_group }} ALL='
-    line: '%{{ balanced_users_admin_group }} ALL=(ALL) ALL'
+    line: '%{{ balanced_users_admin_group }} ALL=(ALL) NOPASSWD: ALL'
     validate: 'visudo -cf %s'
   when: balanced_users_admin_group not in system_groups.stdout_lines
