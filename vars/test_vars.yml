@@ -9,8 +9,6 @@ balanced_users_groups_list:
 - name: randomgroup
   group: randomgroup
 
-balanced_users_admin_group: 'notadmin'
-
 user_mahmoud:
  - name: mahmoud
    state: "{{ state | default('present') }}"

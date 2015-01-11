@@ -8,10 +8,7 @@ balanced_users_enabled: true
 ## removes the default ec2 keyname used to provision the instance
 balanced_users_rm_default_ec2_keyname: true
 
-is_redhat_family: "{{ ansible_os_family == 'RedHat' }}"
-is_debian_family: "{{ ansible_os_family == 'Debian' }}"
-
-balanced_users_admin_group: "{{ 'wheel' if not is_debian_family else 'admin'}}"
+balanced_users_admin_group: "{{ 'admin' if ansible_os_family == 'Debian' else 'wheel' }}"
 
 ##############################
 # Configurable lists for different accounts for creation and management
